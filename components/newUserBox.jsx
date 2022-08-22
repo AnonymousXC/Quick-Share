@@ -7,10 +7,34 @@ import {
     Input,
     Button,
     Image,
+    Text,
 } from "@chakra-ui/react"
+
+import { useState } from "react";
+import { addNewUser } from "../pages/api/firebase"
 
 
 export default function LoginBox() {
+
+    const [getUsername, setUsername] = useState()
+    const [getEmail, setEmail] = useState()
+    const [getPassword, setPassword] = useState()
+
+    const handleSubmit = () => {
+        if(!getUsername || !getEmail || !getPassword) { 
+            document.getElementById("form-status").innerText = "Fill out all the Fields."
+            return;
+        };
+        
+        addNewUser(getUsername, getEmail, getPassword)
+        .then((e) => {
+            document.getElementById("form-status").innerText = e;
+        })
+        .catch((error) => {
+            console.log(error.message);
+        })
+
+    }
 
 
     return (
@@ -43,13 +67,14 @@ export default function LoginBox() {
                 rounded={8}
                 boxShadow="lg">
 
-                    <form>
+                    <form id="main-form">
 
                         <FormControl isRequired>
                             <FormLabel> Username </FormLabel>
                             <Input 
                             variant="filled"
-                            placeholder="John Deo"/>
+                            placeholder="John Deo"
+                            onChange={(e) => { setUsername(e.currentTarget.value)}}/>
                         </FormControl>
 
                         <FormControl mt={6} isRequired>
@@ -57,7 +82,8 @@ export default function LoginBox() {
                             <Input 
                             variant={"filled"}
                             type="email"
-                            placeholder="John@gmail.com"/>
+                            placeholder="John@gmail.com"
+                            onChange={(e) => { setEmail(e.currentTarget.value )}} />
                         </FormControl>
 
                         <FormControl mt={6} isRequired>
@@ -65,14 +91,25 @@ export default function LoginBox() {
                             <Input 
                             type={"password"}
                             variant="filled"
-                            placeholder="Hello World"/>
+                            placeholder="Hello World"
+                            pattern="[a-z0-9]{1,15}"
+                            minLength={8}
+                            onChange={(e) => { setPassword(e.currentTarget.value)}} />
                         </FormControl>
+
+                        <Text 
+                        id="form-status"
+                        pt={3}
+                        textAlign="center"></Text>
 
                         <Button 
                         colorScheme="yellow" 
                         width={"full"}
-                        mt={6}
-                        type="submit">Sign Up</Button>
+                        mt={5}
+                        onSubmit={ () => {return false}}
+                        onClick={(e) => {
+                            handleSubmit();
+                        }}>Sign Up</Button>
 
                     </form>
 
