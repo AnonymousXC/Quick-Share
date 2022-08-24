@@ -1,3 +1,9 @@
+/**
+ * @author Chitransh Verma
+ * @usage LoginBoxForm
+ * @require addNewUser from "firebase"
+ */
+
 import {
     Box,
     Flex,
@@ -8,10 +14,16 @@ import {
     Button,
     Image,
     Text,
+    Link,
 } from "@chakra-ui/react"
+
+import {
+    ExternalLinkIcon
+} from "@chakra-ui/icons"
 
 import { useState } from "react";
 import { addNewUser } from "../pages/api/firebase"
+import NextLink from "next/link"
 
 
 export default function LoginBox() {
@@ -20,21 +32,44 @@ export default function LoginBox() {
     const [getEmail, setEmail] = useState()
     const [getPassword, setPassword] = useState()
 
-    const handleSubmit = () => {
+    /* Requiring */
+    const handleSubmit = () => {        
+        document.getElementById("form-status").innerText = ""
+
         if(!getUsername || !getEmail || !getPassword) { 
             document.getElementById("form-status").innerText = "Fill out all the Fields."
             return;
         };
         
         addNewUser(getUsername, getEmail, getPassword)
-        .then((e) => {
-            document.getElementById("form-status").innerText = e;
+        .then( async (e) => {
+
+            document.getElementById("form-status").innerText = e[0];
+
+            let emailSend = await fetch("api/sendMail", {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: getEmail,
+                    id: e[1],
+                    username: getUsername,
+                }),
+                method: "POST",
+            })
+            let {error} = await emailSend.json()
+            if(!error) document.getElementById("form-status").innerText = "Email with login ID send successfully."
+            else document.getElementById("form-status").innerText = "Email cannot be send. Retry"
+
         })
         .catch((error) => {
-            console.log(error.message);
+            let refractedMsg = error.replace(/.*?\(.+\/(.+)\).*/, "$1");
+            refractedMsg = refractedMsg.replaceAll("-", " ")
+            document.getElementById("form-status").innerText = refractedMsg + ".";
         })
 
     }
+    /* ///////Requiring//////// */
 
 
     return (
@@ -65,7 +100,8 @@ export default function LoginBox() {
                 p={[5, 6, 10]}
                 borderWidth={1}
                 rounded={8}
-                boxShadow="lg">
+                boxShadow="lg"
+                pb={2}>
 
                     <form id="main-form">
 
@@ -94,13 +130,14 @@ export default function LoginBox() {
                             placeholder="Hello World"
                             pattern="[a-z0-9]{1,15}"
                             minLength={8}
-                            onChange={(e) => { setPassword(e.currentTarget.value)}} />
+                            onChange={(e) => { setPassword(e.currentTarget.value)}}/>
                         </FormControl>
 
                         <Text 
                         id="form-status"
                         pt={3}
-                        textAlign="center"></Text>
+                        textAlign="center"
+                        textTransform={"capitalize"}></Text>
 
                         <Button 
                         colorScheme="yellow" 
@@ -113,8 +150,19 @@ export default function LoginBox() {
 
                     </form>
 
+                    <Flex
+                    direction={"row"}
+                    mt={4}
+                    align="center"
+                    justifyContent={"space-between"}>
+                        <NextLink href="/login">
+                            <Link>Already have an account? <ExternalLinkIcon /> </Link>
+                        </NextLink>
+                        <NextLink href="/login">
+                            <Link>Forgot Password? <ExternalLinkIcon /> </Link>
+                        </NextLink>
+                    </Flex>
                 </Flex>
-
             </Box>
 
         </Flex>
