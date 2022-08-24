@@ -48,11 +48,11 @@ function addNewUser(username, email, password) {
         .then( async () => {
             let specialID = (Math.random() + 1).toString(36).substring(4)
 
-            await setDoc(doc(FIRESTORE, "users", specialID), {
+            await setDoc(doc(FIRESTORE, "users", `${specialID}`), {
                 username: username,
                 email: email,
                 password: password,
-                loginID: specialID
+                loginID: `${specialID}`
             })
             .then((e) => {})
             .catch((err) => {})
