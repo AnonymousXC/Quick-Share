@@ -31,6 +31,7 @@ export default function LoginBox() {
     const [getUsername, setUsername] = useState()
     const [getEmail, setEmail] = useState()
     const [getPassword, setPassword] = useState()
+    const [getButtonState, setButtonState] = useState(false)
 
     /* Requiring */
     const handleSubmit = () => {        
@@ -41,6 +42,8 @@ export default function LoginBox() {
             return;
         };
         
+        setButtonState(true)
+
         addNewUser(getUsername, getEmail, getPassword)
         .then( async (e) => {
 
@@ -60,7 +63,7 @@ export default function LoginBox() {
             let {error} = await emailSend.json()
             if(!error) document.getElementById("form-status").innerText = "Email with login ID send successfully."
             else document.getElementById("form-status").innerText = "Email cannot be send. Retry"
-
+            setButtonState(false)
         })
         .catch((error) => {
             let refractedMsg = error.replace(/.*?\(.+\/(.+)\).*/, "$1");
@@ -88,7 +91,7 @@ export default function LoginBox() {
                 justify={"center"}
                 gap={5}>
 
-                    <Heading>Login</Heading>
+                    <Heading>Sign Up</Heading>
                     <Image src="icon.png" alt="icon"/>
 
                 </Flex>
@@ -146,7 +149,8 @@ export default function LoginBox() {
                         onSubmit={ () => {return false}}
                         onClick={(e) => {
                             handleSubmit();
-                        }}>Sign Up</Button>
+                        }}
+                        isLoading={getButtonState}>Sign Up</Button>
 
                     </form>
 

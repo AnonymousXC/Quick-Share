@@ -8,19 +8,18 @@ import {
 import {
     getAuth,
     createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
 } from "firebase/auth"
 
 import {
     getFirestore,
-    collection,
     setDoc,
     doc,
+    getDoc,
 } from "firebase/firestore"
 
 import {
     getDatabase,
-    ref,
-    set
 } from "firebase/database"
 
 
@@ -30,7 +29,7 @@ const firebaseConfig = {
   projectId: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}`,
   storageBucket: `${process.env.FIREBASE_STORAGE_BUCKET}`,
   messagingSenderId: `${process.env.FIREBASE_MESSAGING_SENDER_ID}`,
-  appId: `${process.env.FIREBASE_APP_I}`,
+  appId: `${process.env.FIREBASE_APP_ID}`,
   databaseURL: `${process.env.NEXT_PUBLIC_FIREBASE_DB_URL}`
 };
 
@@ -65,4 +64,23 @@ function addNewUser(username, email, password) {
     })
 }
 
-export { addNewUser }
+function loginUser(specialID) {
+
+    const docRef = doc(FIRESTORE, "users", `${specialID}`);
+
+    return new Promise(async (resolve, reject) => {
+
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()) {
+            signInWithEmailAndPassword(AUTH, docSnap.data().email, docSnap.data().password)
+            .then((e) => {
+                resolve(docSnap.data())
+            })
+        }
+        else reject("No user Found")
+
+    })
+
+}
+
+export { addNewUser, loginUser }
