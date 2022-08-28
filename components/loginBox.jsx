@@ -1,5 +1,9 @@
 import Head from "next/head";
+import { AES } from "crypto-js";
+import { enc } from "crypto-js";
 import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { loginUser } from "../pages/api/firebase";
 import {
     Flex,
@@ -17,6 +21,12 @@ export default function LoginBox() {
 
     const [ getID, setID] = useState()
     const [getButtonState, setButtonState] = useState(false)
+    const router = useRouter()
+
+    let id = router.query.id ? AES.decrypt(router.query.id, "process.env").toString(enc.Utf8) : ""
+    useEffect(() => {
+        setID(id)
+    }, [])
 
     const handleSubmit = () => {
         if(!getID) return
@@ -28,6 +38,9 @@ export default function LoginBox() {
             console.log(e);
         })
         .finally(() => {
+            setButtonState(false)
+        })
+        .catch((e) => {
             setButtonState(false)
         })
     }
@@ -72,6 +85,7 @@ export default function LoginBox() {
                             placeholder="54das415"
                             variant={"filled"}
                             mt={4} 
+                            defaultValue={id}
                             onChange={(e) => { 
                                 setID(e.currentTarget.value)
                                 }}/>

@@ -24,6 +24,8 @@ import {
 import { useState } from "react";
 import { addNewUser } from "../pages/api/firebase"
 import NextLink from "next/link"
+import { useRouter } from "next/router";
+import { AES } from "crypto-js";
 
 
 export default function LoginBox() {
@@ -32,6 +34,7 @@ export default function LoginBox() {
     const [getEmail, setEmail] = useState()
     const [getPassword, setPassword] = useState()
     const [getButtonState, setButtonState] = useState(false)
+    const router = useRouter()
 
     /* Requiring */
     const handleSubmit = () => {        
@@ -61,7 +64,18 @@ export default function LoginBox() {
                 method: "POST",
             })
             let {error} = await emailSend.json()
-            if(!error) document.getElementById("form-status").innerText = "Email with login ID send successfully."
+            if(!error) {
+                document.getElementById("form-status").innerText = "Email with login ID send successfully."
+                let encriptedID = AES.encrypt(e[1], "process.env").toString();
+                setTimeout(() => {
+                    router.push({
+                        pathname: "/login",
+                        query: {
+                            "id" : encriptedID,
+                        }
+                    })
+                }, 1500)
+            }
             else document.getElementById("form-status").innerText = "Email cannot be send. Retry"
             setButtonState(false)
         })
@@ -69,6 +83,7 @@ export default function LoginBox() {
             let refractedMsg = error.replace(/.*?\(.+\/(.+)\).*/, "$1");
             refractedMsg = refractedMsg.replaceAll("-", " ")
             document.getElementById("form-status").innerText = refractedMsg + ".";
+            setButtonState(false)
         })
 
     }

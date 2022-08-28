@@ -21,6 +21,9 @@ import {
 import {
     getDatabase,
 } from "firebase/database"
+import { 
+    AES, 
+    enc } from "crypto-js";
 
 
 const firebaseConfig = {
@@ -42,6 +45,8 @@ const FIRESTORE = getFirestore(APP)
 
 function addNewUser(username, email, password) {
 
+    let encPassword = AES.encrypt(password, "process.env").toString();
+
     return new Promise((resolve, reject) => {
         createUserWithEmailAndPassword(AUTH, email, password)
         .then( async () => {
@@ -50,7 +55,7 @@ function addNewUser(username, email, password) {
             await setDoc(doc(FIRESTORE, "users", `${specialID}`), {
                 username: username,
                 email: email,
-                password: password,
+                password: encPassword,
                 loginID: `${specialID}`
             })
             .then((e) => {})
@@ -72,7 +77,8 @@ function loginUser(specialID) {
 
         const docSnap = await getDoc(docRef);
         if(docSnap.exists()) {
-            signInWithEmailAndPassword(AUTH, docSnap.data().email, docSnap.data().password)
+            let passwordGot = AES.decrypt(docSnap.data().password, "process.env").toString(enc.Utf8)
+            signInWithEmailAndPassword(AUTH, docSnap.data().email, passwordGot)
             .then((e) => {
                 resolve(docSnap.data())
             })
