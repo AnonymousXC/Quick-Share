@@ -12,7 +12,8 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Button
+    Button,
+    Text
 } from "@chakra-ui/react"
 
 
@@ -31,16 +32,26 @@ export default function LoginBox() {
     const handleSubmit = () => {
         if(!getID) return
 
+        const statusDiv = document.getElementById("login-status")
+
         setButtonState(true)
 
         loginUser(getID)
         .then((e) => {
-            console.log(e);
+
+            statusDiv.innerText = "Login Successful. Redirecting..."
+            localStorage.setItem("userID", e.loginID)
+            localStorage.setItem("data", JSON.stringify(e))
+            router.push({
+                pathname: "/dashboard",
+            })
+            
         })
         .finally(() => {
             setButtonState(false)
         })
-        .catch((e) => {
+        .catch((error) => {
+            statusDiv.innerText = error
             setButtonState(false)
         })
     }
@@ -91,8 +102,13 @@ export default function LoginBox() {
                                 }}/>
                         </FormControl>
 
+                        <Text 
+                        id="login-status"
+                        mt={4}
+                        textAlign="center"></Text>
+
                         <Button
-                        mt={6}
+                        mt={4}
                         w="100%"
                         colorScheme="yellow"
                         onClick={() => { handleSubmit() }}

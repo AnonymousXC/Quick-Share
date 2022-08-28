@@ -83,7 +83,7 @@ function loginUser(specialID) {
                 resolve(docSnap.data())
             })
         }
-        else reject("No user Found")
+        else reject("No user Found.")
 
     })
 
