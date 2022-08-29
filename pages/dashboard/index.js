@@ -1,7 +1,7 @@
 import Head from "next/head";
+import SideBar from "../../components/dashboardSideBar";
 import { 
     ChakraProvider,
-    Button,
 } from "@chakra-ui/react";
 
 
@@ -12,6 +12,7 @@ export default function Dashboard() {
                 <title>Quick Share | Dashboard</title>
                 <link href="icon.png" alt="icon" rel="Shortcut-Icon"></link>
             </Head>
+            <SideBar />
         </ChakraProvider>
     )
 }

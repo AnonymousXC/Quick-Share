@@ -1,4 +1,5 @@
 import Head from "next/head";
+import NextLink from "next/link"
 import { AES } from "crypto-js";
 import { enc } from "crypto-js";
 import { useState } from "react";
@@ -13,9 +14,13 @@ import {
     FormLabel,
     Input,
     Button,
-    Text
+    Text,
+    Link
 } from "@chakra-ui/react"
 
+import {
+    ExternalLinkIcon
+} from "@chakra-ui/icons"
 
 
 export default function LoginBox() {
@@ -26,6 +31,8 @@ export default function LoginBox() {
 
     let id = router.query.id ? AES.decrypt(router.query.id, "process.env").toString(enc.Utf8) : ""
     useEffect(() => {
+        id = !router.query.id ? localStorage.getItem("userID") : "";
+        document.getElementById("login-inp").value = id;
         setID(id)
     }, [])
 
@@ -41,7 +48,7 @@ export default function LoginBox() {
 
             statusDiv.innerText = "Login Successful. Redirecting..."
             localStorage.setItem("userID", e.loginID)
-            localStorage.setItem("data", JSON.stringify(e))
+            localStorage.setItem("username", e.username)
             router.push({
                 pathname: "/dashboard",
             })
@@ -93,6 +100,7 @@ export default function LoginBox() {
                         <FormControl isRequired>
                             <FormLabel>Login ID</FormLabel>
                             <Input 
+                            id="login-inp"
                             placeholder="54das415"
                             variant={"filled"}
                             mt={4} 
@@ -114,6 +122,10 @@ export default function LoginBox() {
                         onClick={() => { handleSubmit() }}
                         isLoading={getButtonState}>Login</Button>
                     </form>
+                    <NextLink href="/newuser">
+                        <Link 
+                        mt={4}>Don't Have an Account? <ExternalLinkIcon /> </Link>
+                    </NextLink>
                 </Flex>
                 
             </Flex>
