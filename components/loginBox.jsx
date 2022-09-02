@@ -25,39 +25,39 @@ import {
 
 export default function LoginBox() {
 
-    const [ getID, setID] = useState()
+    const [ getEmail, setEmail] = useState()
+    const [ getPassword, setPassword] = useState()
     const [getButtonState, setButtonState] = useState(false)
     const router = useRouter()
 
-    let id = router.query.id ? AES.decrypt(router.query.id, "process.env").toString(enc.Utf8) : ""
     useEffect(() => {
-        id = !router.query.id ? localStorage.getItem("userID") : "";
-        document.getElementById("login-inp").value = id;
-        setID(id)
+        if(localStorage.getItem("userID") && localStorage.getItem("username") && localStorage.getItem("email"))
+            router.push("/dashboard")
     }, [])
 
     const handleSubmit = () => {
-        if(!getID) return
+        if(!getEmail || !getPassword) return;
 
         const statusDiv = document.getElementById("login-status")
 
         setButtonState(true)
-
-        loginUser(getID)
+        
+        loginUser(getEmail.trim(), getPassword.trim())
         .then((e) => {
 
             statusDiv.innerText = "Login Successful. Redirecting..."
             localStorage.setItem("userID", e.loginID)
             localStorage.setItem("username", e.username)
+            localStorage.setItem("email", e.email)
             router.push({
                 pathname: "/dashboard",
             })
-            
         })
         .finally(() => {
             setButtonState(false)
         })
         .catch((error) => {
+            let refractedError = String(error).replace(/.*\(.+\).*/, `$1`)
             statusDiv.innerText = error
             setButtonState(false)
         })
@@ -98,15 +98,27 @@ export default function LoginBox() {
                 mx={[2,2,0]}>
                     <form>
                         <FormControl isRequired>
-                            <FormLabel>Login ID</FormLabel>
+                            <FormLabel>Email</FormLabel>
                             <Input 
-                            id="login-inp"
-                            placeholder="54das415"
+                            id="email-inp"
+                            placeholder="john@gmail.com"
                             variant={"filled"}
-                            mt={4} 
-                            defaultValue={id}
+                            mt={1}
                             onChange={(e) => { 
-                                setID(e.currentTarget.value)
+                                setEmail(e.currentTarget.value)
+                                }}/>
+                        </FormControl>
+                        <FormControl isRequired
+                        mt={6}>
+                            <FormLabel>Password</FormLabel>
+                            <Input 
+                            id="password-inp"
+                            placeholder="********"
+                            variant={"filled"}
+                            type="password"
+                            mt={1} 
+                            onChange={(e) => { 
+                                setPassword(e.currentTarget.value)
                                 }}/>
                         </FormControl>
 

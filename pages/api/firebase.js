@@ -2,28 +2,32 @@
 import { 
     initializeApp,
     getApps,
-    getApp
+    getApp,
 } from "firebase/app";
 
 import {
     getAuth,
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    signOut,
 } from "firebase/auth"
 
 import {
     getFirestore,
     setDoc,
     doc,
-    getDoc,
+    collection,
+    query,
+    where,
+    getDocs
 } from "firebase/firestore"
 
 import {
     getDatabase,
 } from "firebase/database"
 import { 
-    AES, 
-    enc } from "crypto-js";
+    AES
+} from "crypto-js";
 
 
 const firebaseConfig = {
@@ -69,24 +73,41 @@ function addNewUser(username, email, password) {
     })
 }
 
-function loginUser(specialID) {
+function loginUser(email, password) {
 
-    const docRef = doc(FIRESTORE, "users", `${specialID}`);
+    let FBQUERY = query(collection(FIRESTORE, "users"), where("email", "==", email))
 
     return new Promise(async (resolve, reject) => {
-
-        const docSnap = await getDoc(docRef);
-        if(docSnap.exists()) {
-            let passwordGot = AES.decrypt(docSnap.data().password, "process.env").toString(enc.Utf8)
-            signInWithEmailAndPassword(AUTH, docSnap.data().email, passwordGot)
-            .then((e) => {
-                resolve(docSnap.data())
+        signInWithEmailAndPassword(AUTH, email, password)
+        .then((e) => {
+            getDocs(FBQUERY)
+            .then((userData) => {
+                let data = userData.docs[0].data()
+                delete data.password
+                resolve(data)
             })
-        }
-        else reject("No user Found.")
-
+            .catch((err) => {
+                reject(err)
+            })
+        })
+        .catch((err) => {
+            reject(err)
+        })
     })
 
 }
 
-export { addNewUser, loginUser }
+function logoutUser() {
+    signOut(AUTH)
+    .then((e) => {
+        console.log("Successfully Signed Out");
+        localStorage.removeItem("email")
+        localStorage.removeItem("userID")
+        localStorage.removeItem("username")
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export { addNewUser, loginUser, logoutUser }

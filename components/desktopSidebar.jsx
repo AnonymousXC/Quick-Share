@@ -1,4 +1,6 @@
 import { useEffect } from "react"
+import { useRouter } from "next/router"
+import { logoutUser } from "../pages/api/firebase"
 import {
     Flex,
     Tabs,
@@ -8,11 +10,16 @@ import {
     Wrap,
     Avatar,
     Box,
+    useColorMode,
+    Divider,
     Button
 } from "@chakra-ui/react"
 
 
 export default function DesktopSideBar() {
+
+    let { colorMode, toggleColorMode } = useColorMode()
+    const ROUTER = useRouter()
 
     useEffect(() => {
         let weldoc = document.getElementById("user-wel")
@@ -24,7 +31,8 @@ export default function DesktopSideBar() {
             width={"100%"}
             direction="column"
             justify={"space-between"}
-            h={"100vh"}>
+            h={"100vh"}
+            display={["none", "none", "flex", "flex"]}>
                 <Box
                 pt={10}>
                     <Wrap 
@@ -46,7 +54,7 @@ export default function DesktopSideBar() {
                     <Tabs
                     orientation="vertical"
                     variant={"solid-rounded"}
-                    colorScheme={"yellow"}
+                    colorScheme={"blue"}
                     mt={7}>
                         <TabList
                         width={"100%"}
@@ -59,8 +67,33 @@ export default function DesktopSideBar() {
                         </TabList>
                     </Tabs>
                 </Box>
-                <Button 
-                mb={0}>Log Out</Button>
+                <Flex
+                direction={"column"}>
+                    <Divider />
+                    <Button 
+                    backgroundColor={"transparent"}
+                    rounded="full"
+                    colorScheme="none"
+                    color={"white.600"}
+                    _hover={{
+                        backgroundColor: "transparent"
+                    }}
+                    onClick={() => {
+                        toggleColorMode()
+                    }}>Toggle Theme</Button>
+                    <Button
+                    backgroundColor={"transparent"}
+                    rounded="full"
+                    color={"white.600"}
+                    _hover={{
+                        backgroundColor: "transparent"
+                    }}
+                    colorScheme="none"
+                    onClick={() => {
+                        logoutUser()
+                        ROUTER.reload()
+                    }}>Log Out</Button>
+                </Flex>
             </Flex>
     )
 }

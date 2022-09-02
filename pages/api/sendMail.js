@@ -12,7 +12,7 @@ async function sendEmail(req, res) {
         <div>
           Hi ${req.body.username}, <br>
           Thanks for using our platform. <br>
-          Your login id :- <b>${req.body.id} </b> <br>
+          Your special id :- <b>${req.body.id} </b> <br>
           Hope you enjoy it.
         </div>`,
     });
