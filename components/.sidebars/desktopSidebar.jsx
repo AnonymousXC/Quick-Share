@@ -1,6 +1,6 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import { logoutUser } from "../pages/api/firebase"
+import { logoutUser } from "../../pages/api/firebase"
 import {
     Flex,
     Tabs,
@@ -12,24 +12,30 @@ import {
     Box,
     useColorMode,
     Divider,
-    Button
+    Button,
+    useColorModeValue,
+    TabPanels,
+    TabPanel
 } from "@chakra-ui/react"
 
 
 export default function DesktopSideBar() {
 
-    let { colorMode, toggleColorMode } = useColorMode()
+    let { toggleColorMode } = useColorMode()
+    let backgroundColor = useColorModeValue("gray.300", "gray.900")
     const ROUTER = useRouter()
 
     useEffect(() => {
+        ROUTER.push("/dashboard", undefined, { shallow: true })
         let weldoc = document.getElementById("user-wel")
         weldoc.innerHTML = "Welcome, <br />" + localStorage.getItem("username")
     }, [])
 
     return (
         <Flex
-            width={"100%"}
+            width={["0", "0", "300px", "300px"]}
             direction="column"
+            backgroundColor={backgroundColor}
             justify={"space-between"}
             h={"100vh"}
             display={["none", "none", "flex", "flex"]}>
@@ -54,8 +60,14 @@ export default function DesktopSideBar() {
                     <Tabs
                     orientation="vertical"
                     variant={"solid-rounded"}
-                    colorScheme={"blue"}
-                    mt={7}>
+                    colorScheme={"facebook"}
+                    mt={7}
+                    maxW="100%"
+                    defaultIndex={ROUTER.query.tab}
+                    isFitted={true}
+                    onChange={(e) => {
+                        ROUTER.push(`/dashboard?tab=${e}`, undefined, { shallow: true })
+                    }}>
                         <TabList
                         width={"100%"}
                         lineHeight={8}>

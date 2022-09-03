@@ -1,12 +1,14 @@
 import Head from "next/head";
 import NextLink from "next/link"
-import SideBar from "../../components/dashboardSideBar";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import SideBar from "../../components/.sidebars/desktopSidebar";
 import { 
     ChakraProvider,
     Heading,
     Flex,
     Button,
+    Text,
 } from "@chakra-ui/react";
 
 
@@ -28,13 +30,22 @@ export default function Dashboard() {
 
 
 const DashboardBody = ()  => {
+
+    const ROUTER = useRouter()
+
     return (
         <ChakraProvider>
+            
             <Head>
                 <title>Quick Share | Dashboard</title>
                 <link href="icon.png" alt="icon" rel="Shortcut-Icon"></link>
             </Head>
-            <SideBar />
+
+            <Flex>
+                <SideBar />
+                { ROUTER.query.tab == 4 ? <Text>hELLO</Text> : "" }
+            </Flex>
+
         </ChakraProvider>
     )
 }
