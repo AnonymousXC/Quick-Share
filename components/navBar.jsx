@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import { 
   Box,
@@ -31,6 +32,7 @@ export default function Navbar() {
 
 
 export function DesktopNavBar() {
+  const ROUTER = useRouter()
   const navBGColor  = useColorModeValue("white", "gray.800");
   const navColor = useColorModeValue("gray.800", "white");
   const navBorderColor = useColorModeValue("gray.200", "gray.900");
@@ -108,11 +110,16 @@ export function DesktopNavBar() {
               Sign Up
             </Button>
           </Link>
-          <Link href="/login">
-            <Button colorScheme="teal">
-              Sign In
-            </Button>
-          </Link>
+          <Button 
+          colorScheme="yellow"
+          onClick={() => {
+            if(localStorage.getItem("email") && localStorage.getItem("userID") && localStorage.getItem("username"))
+              ROUTER.push("/dashboard")
+            else
+              ROUTER.push("/login")
+          }}>
+            Sign In
+          </Button>
         </Flex>
       </Flex>
 }

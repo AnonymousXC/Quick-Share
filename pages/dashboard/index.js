@@ -2,13 +2,16 @@ import Head from "next/head";
 import NextLink from "next/link"
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import SideBar from "../../components/.sidebars/desktopSidebar";
+import DesktopSideBar from "../../components/.sidebars/desktopSidebar";
+import MobileMenu from "../../components/.sidebars/mobileMenu";
+import OverviewTab from "../../components/.tab/Overview";
 import { 
     ChakraProvider,
     Heading,
     Flex,
     Button,
     Text,
+    Box,
 } from "@chakra-ui/react";
 
 
@@ -41,10 +44,12 @@ const DashboardBody = ()  => {
                 <link href="icon.png" alt="icon" rel="Shortcut-Icon"></link>
             </Head>
 
-            <Flex>
-                <SideBar />
-                { ROUTER.query.tab == 4 ? <Text>hELLO</Text> : "" }
-            </Flex>
+            <Box
+            display={["block", "block", "flex", "flex"]}>
+                <DesktopSideBar />
+                <MobileMenu />
+                { ROUTER.query.tab == 0 ? <OverviewTab /> : "" }
+            </Box>
 
         </ChakraProvider>
     )
@@ -63,8 +68,10 @@ const ErrorFindingUser = () => {
             justify={"center"}
             align="center"
             h={"100vh"}
+            px={6}
             direction="column"> 
-                <Heading>Error Finding User. Relogin.</Heading>
+                <Heading
+                textAlign={"center"}>Error Finding User. Relogin.</Heading>
                 <NextLink href="/login">
                     <Button
                     mt={6}

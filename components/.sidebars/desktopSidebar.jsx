@@ -14,8 +14,6 @@ import {
     Divider,
     Button,
     useColorModeValue,
-    TabPanels,
-    TabPanel
 } from "@chakra-ui/react"
 
 
@@ -26,7 +24,7 @@ export default function DesktopSideBar() {
     const ROUTER = useRouter()
 
     useEffect(() => {
-        ROUTER.push("/dashboard", undefined, { shallow: true })
+        ROUTER.push("/dashboard?tab=0", undefined, { shallow: true })
         let weldoc = document.getElementById("user-wel")
         weldoc.innerHTML = "Welcome, <br />" + localStorage.getItem("username")
     }, [])
