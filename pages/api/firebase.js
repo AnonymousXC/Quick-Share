@@ -19,7 +19,8 @@ import {
     collection,
     query,
     where,
-    getDocs
+    getDocs,
+    addDoc,
 } from "firebase/firestore"
 
 import {
@@ -110,4 +111,20 @@ function logoutUser() {
     })
 }
 
-export { addNewUser, loginUser, logoutUser }
+function uploadText(text) {
+
+    return new Promise((resolve, reject) => {
+        let coll = collection(FIRESTORE, "users", localStorage.getItem("userID"), "data")
+        addDoc(coll, {
+            text : text
+        })
+        .then((e) => {
+            resolve("Successfully Added")
+        })
+        .catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+export { addNewUser, loginUser, logoutUser, uploadText }

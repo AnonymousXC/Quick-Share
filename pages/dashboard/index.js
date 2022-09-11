@@ -45,7 +45,8 @@ const DashboardBody = ()  => {
             </Head>
 
             <Box
-            display={["block", "block", "flex", "flex"]}>
+            display={["block", "block", "flex", "flex"]}
+            flexDirection="row">
                 <DesktopSideBar />
                 <MobileMenu />
                 { ROUTER.query.tab == 0 ? <OverviewTab /> : "" }
