@@ -24,8 +24,12 @@ import {
 } from "firebase/firestore"
 
 import {
-    getDatabase,
-} from "firebase/database"
+    getStorage, 
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+} from "firebase/storage"
+
 import { 
     AES
 } from "crypto-js";
@@ -35,7 +39,7 @@ const firebaseConfig = {
   apiKey: `${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`,
   authDomain: `${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}`,
   projectId: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}`,
-  storageBucket: `${process.env.FIREBASE_STORAGE_BUCKET}`,
+  storageBucket: `${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}`,
   messagingSenderId: `${process.env.FIREBASE_MESSAGING_SENDER_ID}`,
   appId: `${process.env.FIREBASE_APP_ID}`,
   databaseURL: `${process.env.NEXT_PUBLIC_FIREBASE_DB_URL}`
@@ -44,7 +48,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const APP = getApps().length ? getApp() : initializeApp(firebaseConfig)
 const AUTH = getAuth(APP)
-const DB = getDatabase()
+const STORAGE = getStorage()
 const FIRESTORE = getFirestore(APP)
 
 
@@ -127,4 +131,30 @@ function uploadText(text) {
     })
 }
 
-export { addNewUser, loginUser, logoutUser, uploadText }
+function uploadFile(file) {
+
+    return new Promise((resolve, reject) => {
+        const storageRef = ref(STORAGE, file.name + "-" + localStorage.getItem("userID"))
+        const uploader = uploadBytesResumable(storageRef, file)
+        uploader.then((e) => {
+            const downURL = getDownloadURL(ref(STORAGE, file.name + localStorage.getItem("userID")))
+            downURL.then((url) => {
+                uploadText(url)
+                .then(() => {
+                    resolve("Uploaded Successfully")
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+            })
+            .catch((err) => {
+                reject(err)
+            })
+        })
+        .catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+export { addNewUser, loginUser, logoutUser, uploadText, uploadFile }

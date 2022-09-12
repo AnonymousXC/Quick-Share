@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { uploadText, uploadFile } from "../../pages/api/firebase";
+
 import { 
     ChakraProvider,
     Box,
@@ -13,14 +16,12 @@ import {
     AlertDialogHeader,
     AlertDialogBody,
     AlertDialogFooter,
-    useDisclosure
+    useDisclosure,
 } from "@chakra-ui/react";
 
 import {
     AddIcon
 } from "@chakra-ui/icons"
-import { uploadText } from "../../pages/api/firebase";
-import { useState } from "react";
 
 
 export default function OverviewTab() {
@@ -30,6 +31,7 @@ export default function OverviewTab() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [ alertHeading, setAlertHeading ] = useState()
     const [ alertBody, setAlertBody ] = useState()
+    const [ getFile, setFile] = useState()
 
     return (
         <ChakraProvider>
@@ -44,7 +46,7 @@ export default function OverviewTab() {
                                 onClick={() => {
                                     onClose()
                                 }}
-                                colorScheme={alertHeading === "Successfully Uploaded." ? "green" : "red"}
+                                colorScheme={alertHeading === "Successfully Uploaded." || alertHeading === "Uploaded Document." ? "green" : "red"}
                                 >OK</Button>
                             </AlertDialogFooter>
                         </AlertDialogBody>
@@ -73,12 +75,19 @@ export default function OverviewTab() {
                     <Input 
                     type={"file"}
                     display="none"
-                    id="file-uploader" />
+                    id="file-uploader"
+                    multiple={false}
+                    onChange={() => {
+                        handleFileUpload()
+                        const file = document.getElementById("file-uploader").files[0]
+                        if(file) setFile(file)
+                    }} />
                     <Button
                     colorScheme="blue"
                     w={["100%", "100%", "unset", "unset"]}
                     mt={4}
                     onClick={() => {
+                        if(!getText) return;
                         uploadText(getText)
                         .then((e) => {
                             setAlertHeading("Successfully Uploaded.")
@@ -90,7 +99,18 @@ export default function OverviewTab() {
                             setAlertBody(err)
                         })
                     }}>Upload Text</Button> <br />
-                    <Image></Image> <br />
+
+                    <iframe 
+                    allowtransparency={"true"}
+                    id="preview"
+                    style={{
+                        backgroundColor: "#000",
+                        display: "none",
+                        marginTop: "6px",
+                    }}
+                    width="100%"
+                    height={"auto"}></iframe> <br />
+
                     <Button
                     mt={4}
                     w={["100%", "100%", "unset", "unset"]}
@@ -98,6 +118,23 @@ export default function OverviewTab() {
                     onClick={(e) => {
                         selectFile()
                     }}> <AddIcon mr={3} /> Select File</Button> <br />
+                    <Button
+                    id="upload-btn"
+                    opacity={0}
+                    mt={4}
+                    w={["100%", "100%", "unset", "unset"]}
+                    colorScheme="blue"
+                    onClick={() => {
+                        uploadFile(getFile)
+                        .then((e) => {
+                            setAlertHeading("Uploaded Document.")
+                            onOpen()
+                        })
+                        .catch((e) => {
+                            setAlertHeading("Error Uploading Document.")
+                            onOpen()
+                        })
+                    }}>Upload</Button> <br />
                 </Box>
             </Flex>
         </ChakraProvider>
@@ -107,7 +144,13 @@ export default function OverviewTab() {
 function selectFile() {
     const fileUploader = document.getElementById("file-uploader")
     fileUploader.click()
-    fileUploader.onselect = (e) => {
-        console.log(e);
-    }
+}
+
+function handleFileUpload() {
+    let imagePre = document.getElementById("preview")
+    let files = document.getElementById("file-uploader").files
+    let objURL = URL.createObjectURL(files[0])
+    imagePre.src = objURL
+    imagePre.style.display = "block"
+    document.getElementById("upload-btn").style.opacity = "1"
 }

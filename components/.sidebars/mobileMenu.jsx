@@ -65,6 +65,7 @@ export default function MobileMenu() {
           </Flex>
 
           <Flex
+          zIndex={100}
           pos={"absolute"}
           display={getMenuActive}
           h="calc(100vh - 60px)" 
