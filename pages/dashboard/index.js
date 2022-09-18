@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import DesktopSideBar from "../../components/.sidebars/desktopSidebar";
 import MobileMenu from "../../components/.sidebars/mobileMenu";
 import OverviewTab from "../../components/.tab/Overview";
+import UploadTab from "../../components/.tab/Uploads";
 import { 
     ChakraProvider,
     Heading,
@@ -50,6 +51,7 @@ const DashboardBody = ()  => {
                 <DesktopSideBar />
                 <MobileMenu />
                 { ROUTER.query.tab == 0 ? <OverviewTab /> : "" }
+                { ROUTER.query.tab == 1 ? <UploadTab /> : "" }
             </Box>
 
         </ChakraProvider>

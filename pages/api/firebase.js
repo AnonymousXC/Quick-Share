@@ -27,7 +27,6 @@ import {
     getStorage, 
     ref,
     uploadBytesResumable,
-    getDownloadURL,
 } from "firebase/storage"
 
 import { 
@@ -133,23 +132,20 @@ function uploadText(text) {
 
 function uploadFile(file) {
 
+    const uploadProgressLabel = document.getElementById("uploadProgressLabel")
+    uploadProgressLabel.innerText = "0%"
+
     return new Promise((resolve, reject) => {
-        const storageRef = ref(STORAGE, file.name + "-" + localStorage.getItem("userID"))
+        const storageRef = ref(STORAGE, localStorage.getItem("userID") + "/" + file.name + "-" + localStorage.getItem("userID"))
         const uploader = uploadBytesResumable(storageRef, file)
+
+        uploader.on("state_changed", (snapshot) => {
+            let percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            uploadProgressLabel.innerText = percent + "%"
+        })
+
         uploader.then((e) => {
-            const downURL = getDownloadURL(ref(STORAGE, file.name + localStorage.getItem("userID")))
-            downURL.then((url) => {
-                uploadText(url)
-                .then(() => {
-                    resolve("Uploaded Successfully")
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-            })
-            .catch((err) => {
-                reject(err)
-            })
+            resolve("Uploaded Successfully")
         })
         .catch((err) => {
             reject(err)
@@ -157,4 +153,55 @@ function uploadFile(file) {
     })
 }
 
-export { addNewUser, loginUser, logoutUser, uploadText, uploadFile }
+async function readTextData() {
+    let html = ``
+    const userID = localStorage.getItem("userID")
+    let data = await getDocs(collection(FIRESTORE, `users/${userID}/data`))
+    data.forEach((snapshot) => {
+        if(!snapshot.exists()) return;
+        html += `
+        <div style="
+                background: var(--chakra-colors-gray-700);
+                color: #fff !important;
+                margin: 6px;
+                padding: 6px;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 60%;
+                max-height: 100%;
+                overflow-y: auto;
+            ">${snapshot.data().text} <br>
+            <div>
+                <button class="copy-btn" style="
+                    position: relative;
+                    bottom: 0px;
+                    width: 100%;
+                    background: var(--chakra-colors-whiteAlpha-400);
+                    border-radius: 8px;    
+                " >Copy</button> 
+                <button style="
+                    position: relative;
+                    bottom: 0px;
+                    width: 100%;
+                    margin-top: 6px;
+                    background: var(--chakra-colors-whiteAlpha-400);
+                    border-radius: 8px;    
+                " >Share</button>
+            </div>
+        </div>
+        `
+    })
+    return html
+}
+
+
+export { 
+    addNewUser, 
+    loginUser, 
+    logoutUser, 
+    uploadText, 
+    uploadFile, 
+    readTextData 
+}

@@ -61,7 +61,7 @@ export default function DesktopSideBar() {
                     colorScheme={"facebook"}
                     mt={7}
                     maxW="100%"
-                    defaultIndex={ROUTER.query.tab}
+                    defaultIndex={0}
                     isFitted={true}
                     onChange={(e) => {
                         ROUTER.push(`/dashboard?tab=${e}`, undefined, { shallow: true })

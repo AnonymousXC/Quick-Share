@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { uploadText, uploadFile } from "../../pages/api/firebase";
+import UploadProgress from "../uploadProgress";
 
 import { 
     ChakraProvider,
@@ -26,12 +27,13 @@ import {
 
 export default function OverviewTab() {
 
-    const bgColor = useColorModeValue("gray.400", "gray.900")
+    let bgColor = useColorModeValue("gray.400", "gray.900") 
     const [ getText, setText ] = useState()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [ alertHeading, setAlertHeading ] = useState()
     const [ alertBody, setAlertBody ] = useState()
     const [ getFile, setFile] = useState()
+    const [ progressDisplay, setProgressDisplay] = useState("none")
 
     return (
         <ChakraProvider>
@@ -63,7 +65,7 @@ export default function OverviewTab() {
                 <Textarea
                 w={["100%", "100%", "50%", "50%"]}
                 resize="none"
-                h={"100%"}
+                h={["25vh" , "25vh", "100%", "100%"]}
                 onChange={(e) => {
                     setText(e.currentTarget.value)
                 }}
@@ -106,7 +108,7 @@ export default function OverviewTab() {
                     style={{
                         backgroundColor: "#000",
                         display: "none",
-                        marginTop: "6px",
+                        marginTop: "16px",
                     }}
                     width="100%"
                     height={"auto"}></iframe> <br />
@@ -125,18 +127,23 @@ export default function OverviewTab() {
                     w={["100%", "100%", "unset", "unset"]}
                     colorScheme="blue"
                     onClick={() => {
+                        setProgressDisplay("flex")
                         uploadFile(getFile)
                         .then((e) => {
                             setAlertHeading("Uploaded Document.")
                             onOpen()
+                            setProgressDisplay("none")
                         })
                         .catch((e) => {
                             setAlertHeading("Error Uploading Document.")
                             onOpen()
+                            setProgressDisplay("none")
                         })
                     }}>Upload</Button> <br />
                 </Box>
             </Flex>
+            <UploadProgress
+            display={progressDisplay} />
         </ChakraProvider>
     )
 }
